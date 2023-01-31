@@ -15,7 +15,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false)
   const [allPosts, setAllPosts] = useState<allPostsType[]>([postPlaceholder])
   const [searchText, setSearchText] = useState('')
-  const [searchedResult, setSearchedResult] = useState<allPostsType[]>([postPlaceholder])
+  const [searchedResult, setSearchedResult] = useState<allPostsType[]>([postPlaceholder] || undefined)
   const [searchTimeout, setSearchTimeout] = useState<any>(null)
 
 
@@ -85,7 +85,7 @@ const Home = () => {
 export default Home
 
 const RenderCards = ({ data, title }: { data: any, title: string }) => {
-  if (data[0]._id !== '') return (
+  if (data.length > 0 && data[0]._id !== '') return (
     data.map((post: any) => <Card key={data._id} {...post} />
     ))
 
