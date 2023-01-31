@@ -1,14 +1,42 @@
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { ChangeEvent, SetStateAction, useEffect, useState } from 'react'
 
 import { Card, FormField, Loader } from '../components'
 
+interface allPostsType {
+  _id: string,
+  name: string,
+  prompt: string,
+  photo: string,
+}
+
+const postPlaceholder = { _id: '', name: '', photo: '', prompt: '' }
+
 const Home = () => {
   const [loading, setLoading] = useState(false)
-  const [allPosts, setAllPosts] = useState(null)
+  const [allPosts, setAllPosts] = useState<allPostsType[]>([postPlaceholder])
   const [searchText, setSearchText] = useState('')
+  const [searchedResult, setSearchedResult] = useState<allPostsType[]>([postPlaceholder])
+  const [searchTimeout, setSearchTimeout] = useState<any>(null)
+
 
   useFetchPosts(setLoading, setAllPosts)
 
+  const handleSearchChange = (e: ChangeEvent) => {
+    clearTimeout(searchTimeout)
+    const target = e.target as HTMLInputElement
+    setSearchText(target.value)
+
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = allPosts.filter(item => (
+          item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.prompt.toLowerCase().includes(searchText.toLowerCase())
+        ))
+
+        setSearchedResult(searchResult)
+      }, 500)
+    )
+  }
 
   return (
     <section className='max-w-7xl mx-auto'>
@@ -18,7 +46,14 @@ const Home = () => {
       </div>
 
       <div className='mt-16'>
-        {/* <FormField /> */}
+        <FormField
+          label='Search posts'
+          type='text'
+          name='text'
+          placeholder='search posts'
+          value={searchText}
+          handleChange={handleSearchChange}
+        />
       </div>
 
       <div className='mt-10'>
@@ -35,7 +70,7 @@ const Home = () => {
             )}
             <div className='grid lg:grid-cols-4 sm:grid-cols-3 xs-grid-cols-2 grid-cols-1 gap-3'>
               {searchText ? (
-                <RenderCards data={[]} title='No search result found' />
+                <RenderCards data={searchedResult} title='No search result found' />
               ) : (
                 <RenderCards data={allPosts} title='no posts found' />
               )}
@@ -50,7 +85,7 @@ const Home = () => {
 export default Home
 
 const RenderCards = ({ data, title }: { data: any, title: string }) => {
-  if (data && data.length > 0) return (
+  if (data[0]._id !== '') return (
     data.map((post: any) => <Card key={data._id} {...post} />
     ))
 

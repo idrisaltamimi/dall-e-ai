@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver'
+
 import { surpriseMePrompts } from '../constants'
 
 export function getRandomPrompt(prompt: string): string {
@@ -7,4 +9,8 @@ export function getRandomPrompt(prompt: string): string {
   if (randomPrompt === prompt) return getRandomPrompt(prompt)
 
   return randomPrompt
+}
+
+export const downloadImage = (_id: string, photo: string) => {
+  saveAs(photo, `download-${_id}.jpg`)
 }
